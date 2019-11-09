@@ -22,9 +22,9 @@ function chebyshevDistance($datasample_1, $datasample_2) {
 
     $countSample = count($datasample_1);
     
-    $max = -1;
+    $max = abs($datasample_1[0] - $datasample_2[0]);
 
-    foreach (range(0, $countSample - 1) as $i) {
+    foreach (range(1, $countSample - 1) as $i) {
 
         if ( ! isset($datasample_1[$i])) {
             echo '<pre>';
@@ -42,7 +42,7 @@ function chebyshevDistance($datasample_1, $datasample_2) {
 
         $subtractResult = abs($datasample_1[$i] - $datasample_2[$i]);
         
-        $max = $subtractResult > $max ? $subtractResult : $max;
+        $max = max($subtractResult, $max);
     }
 
     return $max;
