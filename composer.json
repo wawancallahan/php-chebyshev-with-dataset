@@ -1,0 +1,13 @@
+{
+    "name": "wawancallahan/chebyshev",
+    "type": "project",
+    "require": {
+        "php-ai/php-ml": "^0.8.0"
+    },
+    "authors": [
+        {
+            "name": "wawancallahan",
+            "email": "wawan.callahan@gmail.com"
+        }
+    ]
+}
