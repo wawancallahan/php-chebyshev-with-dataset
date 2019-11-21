@@ -99,6 +99,8 @@ foreach (range(0, $k - 1) as $range) {
     }
 }
 
+$resultDonated = $canDonateBlood >= $cannotDonateBlood ? 1 : 0;
+
 echo json_encode([
     'input' => [
         'v1' => $v1,
@@ -110,6 +112,6 @@ echo json_encode([
         'length_sample' => count($datasetSamples),
         'k' => $k
     ],
-    'result' => $canDonateBlood >= $cannotDonateBlood ? 1 : 0,
-    'result_text' => $canDonateBlood >= $cannotDonateBlood ? "" : "Tidak " . "Dapat Berdonasi/ Tranfusi Darah"
+    'result' => $resultDonated,
+    'result_text' => ($resultDonated == 1 ? "" : "Tidak ") . "Dapat Berdonasi/ Tranfusi Darah"
 ]);
