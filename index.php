@@ -1,100 +1,83 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chebyshev Distance</title>
 
-require_once __DIR__ . '/vendor/autoload.php';
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <form action="proses.php" method="POST">
+            <div class="form-group">
+                <label for="">months since last donation</label>
+                <input type="number" min="0" name="v1" class="form-control">
+            </div>
 
-use Phpml\Dataset\CsvDataset;
-use Phpml\Math\Distance\Chebyshev;
+            <div class="form-group">
+                <label for="">total number of donation</label>
+                <input type="number" min="0" name="v2" class="form-control">
+            </div>
 
-function getDataSetSeason($data, $season, $index) {
-    $newArrayFiltered = array_filter($data, function ($item) use ($season) {
-        return $item[2] == $season;
-    });
+            <div class="form-group">
+                <label for="">total blood donated in c.c.</label>
+                <input type="number" min="0" name="v3" class="form-control">
+            </div>
 
-    return array_map(function ($item) use ($index) {
-        return $item[$index];
-    }, $newArrayFiltered, []);
-}
+            <div class="form-group">
+                <label for="">months since first donation</label>
+                <input type="number" min="0" name="v4" class="form-control">
+            </div>
 
-function chebyshevDistance($datasample_1, $datasample_2) {
-    if (count($datasample_1) != count($datasample_2)) {
-        return -1;
-    }
+            <div class="form-group">
+                <button type="submit" id="form-submit" class="btn btn-md btn-primary btn-block">Proses</button>
+            </div>
+        </form>
 
-    $countSample = count($datasample_1);
-    
-    $max = abs($datasample_1[0] - $datasample_2[0]);
+        <div id="result">
 
-    foreach (range(1, $countSample - 1) as $i) {
+        </div>
 
-        if ( ! isset($datasample_1[$i])) {
-            echo '<pre>';
-            echo 'Data Sample 1 : ' . $i;
-            echo var_dump($datasample_1[$i]);
-            echo '</pre>';
-        }
+    </div>
 
-        if ( ! isset($datasample_2[$i])) {
-            echo '<pre>';
-            echo 'Data Sample 2 ' . $i;
-            echo var_dump($datasample_2[$i]);
-            echo '</pre>';
-        }
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/propper.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
 
-        $subtractResult = abs($datasample_1[$i] - $datasample_2[$i]);
+    <script>
+        $(function () {
+            $('#form-submit').on('click', function (e) {
+                e.preventDefault();
+
+                var el = $(e.currentTarget);
+
+                var form = $(el).closest('form');
+
+                $.ajax({
+                   url: 'proses.php',
+                   type: 'POST',
+                   dataType: 'json', 
+                   data: {
+                       v1: form.find('input[name=v1]').val(),
+                       v2: form.find('input[name=v2]').val(),
+                       v3: form.find('input[name=v3]').val(),
+                       v4: form.find('input[name=v4]').val()
+                   }
+                })
+                .then(function (response) {
+
+                })
+                .catch(function (error) {
+
+                });
+            });
+        });
+    </script>
+
+    <script type="text/template">
         
-        $max = max($subtractResult, $max);
-    }
-
-    return $max;
-}
-
-$chebyshev = new Chebyshev();
-
-$datasets = new CsvDataset('./datasets/day.csv', 15, true);
-
-$datasetColumnNames = $datasets->getColumnNames();
-$datasetSamples = $datasets->getSamples();
-
-$datasetSeason1 = getDataSetSeason($datasetSamples, 1, 14);
-$datasetSeason2 = getDataSetSeason($datasetSamples, 2, 14);
-$datasetSeason3 = getDataSetSeason($datasetSamples, 3, 14);
-$datasetSeason4 = getDataSetSeason($datasetSamples, 4, 14);
-
-$countMinimunRegistered = min(
-    count($datasetSeason1),
-    count($datasetSeason2),
-    count($datasetSeason3),
-    count($datasetSeason4)
-);
-
-$datasetSeason1 = array_slice($datasetSeason1, 0, count($datasetSeason1) - (count($datasetSeason1) - $countMinimunRegistered));
-$datasetSeason2 = array_slice($datasetSeason2, 0, count($datasetSeason2) - (count($datasetSeason2) - $countMinimunRegistered));
-$datasetSeason3 = array_slice($datasetSeason3, 0, count($datasetSeason3) - (count($datasetSeason3) - $countMinimunRegistered));
-$datasetSeason4 = array_slice($datasetSeason4, 0, count($datasetSeason4) - (count($datasetSeason4) - $countMinimunRegistered));
-
-echo 'Chebyshev Distance <br>';
-echo 'Data Pegguna Peminjaman Sepeda <br>';
-
-echo '<br>';
-
-echo 'Jumlah Dari Musim Semi dan Musim Panas   : ' . chebyshevDistance($datasetSeason1, $datasetSeason2)  . ' - ' . $chebyshev->distance($datasetSeason1, $datasetSeason2) . ' <br>';
-echo 'Jumlah Dari Musim Semi dan Musim Gugur   : ' . chebyshevDistance($datasetSeason1, $datasetSeason3)  . ' - ' . $chebyshev->distance($datasetSeason1, $datasetSeason3) . ' <br>';
-echo 'Jumlah Dari Musim Semi dan Musim Dingin  : ' . chebyshevDistance($datasetSeason1, $datasetSeason4)  . ' - ' . $chebyshev->distance($datasetSeason1, $datasetSeason4) . ' <br>';
-
-echo '<br>';
-
-echo 'Jumlah Dari Musim Panas dan Musim Semi   : ' . chebyshevDistance($datasetSeason2, $datasetSeason1)  . ' - ' . $chebyshev->distance($datasetSeason2, $datasetSeason1) . ' <br>';
-echo 'Jumlah Dari Musim Panas dan Musim Gugur  : ' . chebyshevDistance($datasetSeason2, $datasetSeason3)  . ' - ' . $chebyshev->distance($datasetSeason2, $datasetSeason3) . ' <br>';
-echo 'Jumlah Dari Musim Panas dan Musim Dingin : ' . chebyshevDistance($datasetSeason2, $datasetSeason4)  . ' - ' . $chebyshev->distance($datasetSeason2, $datasetSeason4) . ' <br>';
-
-echo '<br>';
-
-echo 'Jumlah Dari Musim Gugur dan Musim Semi   : ' . chebyshevDistance($datasetSeason3, $datasetSeason1)  . ' - ' . $chebyshev->distance($datasetSeason3, $datasetSeason1) . ' <br>';
-echo 'Jumlah Dari Musim Gugur dan Musim Panas  : ' . chebyshevDistance($datasetSeason3, $datasetSeason2)  . ' - ' . $chebyshev->distance($datasetSeason3, $datasetSeason2) . ' <br>';
-echo 'Jumlah Dari Musim Gugur dan Musim Dingin : ' . chebyshevDistance($datasetSeason3, $datasetSeason4)  . ' - ' . $chebyshev->distance($datasetSeason3, $datasetSeason4) . ' <br>';
-
-echo '<br>';
-
-echo 'Jumlah Dari Musim Dingin dan Musim Semi  : ' . chebyshevDistance($datasetSeason4, $datasetSeason1)  . ' - ' . $chebyshev->distance($datasetSeason4, $datasetSeason1) . ' <br>';
-echo 'Jumlah Dari Musim Dingin dan Musim Panas : ' . chebyshevDistance($datasetSeason4, $datasetSeason2)  . ' - ' . $chebyshev->distance($datasetSeason4, $datasetSeason2) . ' <br>';
-echo 'Jumlah Dari Musim Dingin dan Musim Gugur : ' . chebyshevDistance($datasetSeason4, $datasetSeason3)  . ' - ' . $chebyshev->distance($datasetSeason4, $datasetSeason3) . ' <br>';
+    </script>
+</body>
+</html>
