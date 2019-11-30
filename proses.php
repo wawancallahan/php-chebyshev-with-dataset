@@ -64,12 +64,12 @@ foreach ($newSampleData as $datasetKey => $dataset) {
 
     foreach (range($attributeCountStart, $attributeCountEnd) as $attributeRange) {
         if ($result == null) {
-            $result = abs($dataset[$attributeRange] - $inputSampleData[$field[$attributeRange]]);
+            $result = number_format(abs($dataset[$attributeRange] - $inputSampleData[$field[$attributeRange]]), 2, ".", "");
 
             continue;
         }
 
-        $result = max($result, abs($dataset[$attributeRange] - $inputSampleData[$field[$attributeRange]]));
+        $result = max($result, number_format(abs($dataset[$attributeRange] - $inputSampleData[$field[$attributeRange]]), 2, ".", ""));
     }
 
     $distance[$datasetKey] = $result;
@@ -86,16 +86,48 @@ foreach ($distance as $index => $ds) {
     ];
 }
 
-$k = number_format(sqrt(count($datasetSamples)));
+$k = number_format(sqrt(count($datasetSamples) / 2));
+
+if (count($datasetSamples) % 2 == 0) {
+    if ($k % 2 == 0) {
+        $k += 1;
+    }
+} else {
+    if ($k % 2 != 0) {
+        $k += 1;
+    }
+}
+
+$kId = 0;
+
+$resultDistance = [];
+$resultData = [];
+
+foreach ($newDistance as $keyDistance => $distanceItem) {
+    if ( ! in_array($distanceItem['result'], $resultDistance)) {
+        $resultDistance[] = $distanceItem['result'];
+
+        $resultData[$kId][] = $distanceItem;
+
+        $kId += 1;
+
+        if ($kId == $k) {
+            break;
+        }
+    } else {
+        $resultData[$kId - 1][] = $distanceItem;
+    }
+}
 
 $canDonateBlood = $cannotDonateBlood = 0;
-foreach (range(0, $k - 1) as $range) {
-    $result = $datasetSamples[$newDistance[$range]['key']][4];
 
-    if ($result == 1) {
-        $cannotDonateBlood++;
-    } else {
-        $canDonateBlood++;
+foreach ($resultData as $dataItems) {
+    foreach ($dataItems as $dataItem) {
+        if ($datasetSamples[$dataItem['key']][4] == 1) {
+            $cannotDonateBlood++;
+        } else {
+            $canDonateBlood++;
+        }
     }
 }
 
@@ -112,6 +144,11 @@ echo json_encode([
         'length_sample' => count($datasetSamples),
         'k' => $k
     ],
+    'result_data' => $resultData,
     'result' => $resultDonated,
+    'result_length' => [
+        'canDonateBlood' => $canDonateBlood,
+        'cannotDonateBlood' => $cannotDonateBlood
+    ],
     'result_text' => ($resultDonated == 1 ? "" : "Tidak ") . "Dapat Berdonasi/ Tranfusi Darah"
 ]);
