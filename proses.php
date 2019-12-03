@@ -86,7 +86,7 @@ foreach ($distance as $index => $ds) {
     ];
 }
 
-$k = number_format(sqrt(count($datasetSamples) / 2));
+$k = number_format(sqrt(count($datasetSamples)));
 
 if (count($datasetSamples) % 2 == 0) {
     if ($k % 2 == 0) {
