@@ -95,7 +95,7 @@
                 }
 
                 $.ajax({
-                        url: 'proses2.php',
+                        url: 'proses.php',
                         type: 'POST',
                         dataType: 'json',
                         data: {
