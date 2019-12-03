@@ -119,17 +119,59 @@ foreach ($newDistance as $keyDistance => $distanceItem) {
     }
 }
 
+$resultDataViewRow = '';
+
 $canDonateBlood = $cannotDonateBlood = 0;
 
+$no = 1;
+
 foreach ($resultData as $dataItems) {
-    foreach ($dataItems as $dataItem) {
+    foreach ($dataItems as $dataItemKey => $dataItem) {
         if ($datasetSamples[$dataItem['key']][4] == 1) {
             $cannotDonateBlood++;
         } else {
             $canDonateBlood++;
         }
+
+        if ($dataItemKey == 0) {
+            $resultDataViewRow .= '<tr>' .
+                                '<td rowspan="' . count($dataItems) . '">' . $no++ . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][0] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][1] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][2] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][3] . '</td>' . 
+                                '<td>' . ($datasetSamples[$dataItem['key']][4] == 1 ? 'Tidak Dapat Berdonasi' : 'Dapat Berdonasi') . '</td>' . 
+                                '<td>' . $dataItem['result'] . '</td>' . 
+                            '</tr>';
+        } else {
+            $resultDataViewRow .= '<tr>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][0] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][1] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][2] . '</td>' . 
+                                '<td>' . $datasetSamples[$dataItem['key']][3] . '</td>' . 
+                                '<td>' . ($datasetSamples[$dataItem['key']][4] == 1 ? 'Tidak Dapat Berdonasi' : 'Dapat Berdonasi') . '</td>' . 
+                                '<td>' . $dataItem['result'] . '</td>' . 
+                            '</tr>';
+        }
     }
 }
+
+$resultDataView = '<table class="table">' . 
+                    '<thead>' .
+                        '<tr>' .
+                            '<th>No</th>' .
+                            '<th>V1</th>' .
+                            '<th>V2</th>' .
+                            '<th>V3</th>' .
+                            '<th>V4</th>' .
+                            '<th>Kelas</th>' .
+                            '<th>Hasil</th>' .
+                        '</tr>' .
+                    '</thead>' .
+                    '<tbody>' .
+                        $resultDataViewRow .
+                    '</tbody>' .
+                '</table';
 
 $resultDonated = $canDonateBlood >= $cannotDonateBlood ? 1 : 0;
 
@@ -145,6 +187,7 @@ echo json_encode([
         'k' => $k
     ],
     'result_data' => $resultData,
+    'result_data_view' => $resultDataView,
     'result' => $resultDonated,
     'result_length' => [
         'canDonateBlood' => $canDonateBlood,

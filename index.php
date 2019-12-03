@@ -135,6 +135,9 @@
                                 <div>
                                     Hasil : ${result_text}
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                ${response.result_data_view}
                             </div>`
                         );
 
