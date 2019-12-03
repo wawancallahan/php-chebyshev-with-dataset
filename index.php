@@ -138,6 +138,10 @@
                             </div>
                             <div class="form-group">
                                 ${response.result_data_view}
+                            </div>
+                            <div class="form-group">
+                                Jumlah Kelas Dapat Berdonasi : ${response.result_length.canDonateBlood} <br>
+                                Jumlah Kelas Tidak Dapat Berdonasi : ${response.result_length.cannotDonateBlood} 
                             </div>`
                         );
 
